@@ -8,7 +8,7 @@ class User extends AppEntity {
   bool? blockedByMe = false;
   int? credits;
   bool? hasBlockedMe = false;
-  double? lastActiveAt;
+  num? lastActiveAt;
   String? link;
   Map<dynamic, dynamic>? metadata;
   String? name;
@@ -33,11 +33,11 @@ class User extends AppEntity {
     uid = json['uid'];
   }
 
-  UserStatus? getUserStatus(int value) {
+  UserStatus? getUserStatus(String value) {
     switch (value) {
-      case 0:
+      case "online":
         return UserStatus.online;
-      case 1:
+      case "offline":
         return UserStatus.offline;
 
       default:
@@ -45,6 +45,7 @@ class User extends AppEntity {
   }
 
   /// Update properties from a map.
+  @override
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['avatar'] = avatar;
@@ -88,6 +89,7 @@ class User extends AppEntity {
   Map<String, dynamic> toMap() => toJson();
 
   /// Override  "=="
+  @override
   bool operator ==(o) => (o is User &&
       o.avatar == avatar &&
       o.blockedByMe == blockedByMe &&
@@ -128,7 +130,7 @@ class User extends AppEntity {
   }
 
   /// Get last online timestamp of the user
-  double? getLastActiveAt() {
+  num? getLastActiveAt() {
     return lastActiveAt;
   }
 
@@ -198,7 +200,7 @@ class User extends AppEntity {
   }
 
   /// Set last online timestamp of the user
-  void setLastActiveAt(double lastActiveAt) {
+  void setLastActiveAt(num lastActiveAt) {
     this.lastActiveAt = lastActiveAt;
   }
 

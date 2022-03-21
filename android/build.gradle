@@ -16,6 +16,10 @@ rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
+
+        maven {
+        url "https://dl.cloudsmith.io/public/cometchat/cometchat-pro-android/maven/"
+        }
     }
 }
 
@@ -30,6 +34,11 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
     }
+}
+
+
+dependencies {
+    implementation 'com.cometchat:pro-android-chat-sdk:3.0.4'
 }
