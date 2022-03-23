@@ -47,7 +47,7 @@ public class LoginLogoutHelper {
           
           CometChat.login(authToken: tAuthToken , onSuccess: { (user) in
               do {
-                  try self.eventChannelHandler?.success(event: ["loginSuccess": Helper.userToJson(user: user)])
+                  try self.eventChannelHandler?.success(event: ["loginSuccess": Helper.userToJson(user: user).jsonStringRepresentation])
               } catch {
                   self.eventChannelHandler?.error(code: "loginFailure", message: error.localizedDescription)
               }
@@ -71,7 +71,7 @@ public class LoginLogoutHelper {
 
                 print("Login successful : " + user.stringValue())
                 do {
-                    try self.eventChannelHandler?.success(event: ["loginSuccess":  Helper.userToJson(user: user)])
+                    try self.eventChannelHandler?.success(event: ["loginSuccess": Helper.userToJson(user: user).jsonStringRepresentation])
                 } catch {
                     self.eventChannelHandler?.error(code: "loginFailure", message: error.localizedDescription)
                 }

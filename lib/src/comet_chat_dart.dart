@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 /// Comet Chat utility package.
 ///
@@ -16,9 +17,16 @@ class FlutterCometChatDart {
   static const EventChannel loginEventListener =
       EventChannel("plugins.flutter.io/login_event_listener");
 
+  static const EventChannel messageEventTrigger =
+      EventChannel('plugins.flutter.io/message_event_trigger');
+  static const EventChannel messageEventListener =
+      EventChannel("plugins.flutter.io/message_event_listener");
+
   late StreamSubscription _loginEventsubscription;
+  late StreamSubscription _messageEventsubscription;
 
   final Authentication _auth = Authentication();
+  final Messaging _messaging = Messaging();
 
   cancelSubscription(StreamSubscription streamSubscription) {
     return () {
@@ -63,9 +71,8 @@ class FlutterCometChatDart {
 
     _loginEventsubscription = _auth.loginEventTrigger().listen((event) {
       if (event.containsKey(CometConstantsKeys.LOGIN_SUCCESS)) {
-        // var data = jsonDecode(event[CometConstantsKeys.LOGIN_SUCCESS]);
-        callbackListener.onSuccess(User.fromJson(Map<String, dynamic>.from(
-            event[CometConstantsKeys.LOGIN_SUCCESS])));
+        var data = jsonDecode(event[CometConstantsKeys.LOGIN_SUCCESS]);
+        callbackListener.onSuccess(User.fromJson(data));
       }
       if (event.containsKey(CometConstantsKeys.LOGIN_FAILURE)) {
         callbackListener.onError(event);
@@ -107,9 +114,8 @@ class FlutterCometChatDart {
         loginListener.loginFailure(event);
       }
       if (event.containsKey(CometConstantsKeys.LOGIN_SUCCESS)) {
-        // var data = jsonDecode(event[CometConstantsKeys.LOGIN_SUCCESS]);
-        loginListener.loginSuccess(User.fromJson(Map<String, dynamic>.from(
-            event[CometConstantsKeys.LOGIN_SUCCESS])));
+        var data = jsonDecode(event[CometConstantsKeys.LOGIN_SUCCESS]);
+        loginListener.loginSuccess(User.fromJson(data));
       }
       if (event.containsKey(CometConstantsKeys.LOGOUT_FAILURE)) {
         loginListener.logoutFailure(event[CometConstantsKeys.LOGOUT_FAILURE]);
@@ -118,6 +124,31 @@ class FlutterCometChatDart {
         loginListener.logoutSuccess(event[CometConstantsKeys.LOGOUT_SUCCESS]);
       }
     });
+  }
+
+  /// To send a text message to a single user or group
+  /// * [textMessage] it is a TextMessage object that requires receiverID, messageText, receiverType
+  /// * [callbackListener] this will give onSuccess and onError response
+  /// 1. [onSuccess] : returns TextMessage object
+  /// 2. [onError] : returns error if message is not sent
+  Future<void> sendMessage(
+      TextMessage textMessage, CallbackListener callbackListener) async {
+    _messaging.sendMessage(textMessage);
+
+    _messageEventsubscription =
+        _messaging.messageEventTrigger().listen((event) {
+      if (event.containsKey(CometConstantsKeys.TEXT_MESSAGE)) {
+        // var data = jsonDecode(event[CometConstantsKeys.TEXT_MESSAGE]);
+        callbackListener.onSuccess(TextMessage.fromJson(
+            Map<dynamic, dynamic>.from(
+                event[CometConstantsKeys.TEXT_MESSAGE])));
+      }
+      if (event.containsKey(CometConstantsKeys.TEXT_MESSAGE_SENDING_FAILED)) {
+        callbackListener.onError(event);
+      }
+    });
+
+    cancelSubscription(_messageEventsubscription);
   }
 
   static Exception convertException(PlatformException err) {

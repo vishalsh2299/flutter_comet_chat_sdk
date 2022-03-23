@@ -20,7 +20,7 @@ public class LoginListener: CometChatLoginDelegate {
        print("LOGIN SUCCESS")
         do {
             try eventChannelHandler?.success(
-                event: ["loginSuccess":  Helper.userToJson(user: user)]
+                event: ["loginSuccess":  Helper.userToJson(user: user).jsonStringRepresentation]
             )
         } catch {
             eventChannelHandler?.error(
