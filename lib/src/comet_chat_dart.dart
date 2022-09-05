@@ -6,6 +6,7 @@ import 'dart:convert';
 /// This is a preliminary API.
 import 'package:flutter/services.dart';
 import 'package:flutter_comet_chat_sdk/flutter_comet_chat_sdk.dart';
+import 'package:flutter_comet_chat_sdk/src/calling.dart';
 
 /// Entry point for the CometChat Dart.
 class FlutterCometChatDart {
@@ -22,11 +23,15 @@ class FlutterCometChatDart {
   static const EventChannel messageEventListener =
       EventChannel("plugins.flutter.io/message_event_listener");
 
+  static const EventChannel callingEventChannel =
+      EventChannel('plugins.flutter.io/calling_details');
+
   late StreamSubscription _loginEventsubscription;
   late StreamSubscription _messageEventsubscription;
 
   final Authentication _auth = Authentication();
   final Messaging _messaging = Messaging();
+  final Calling _call = Calling();
 
   cancelSubscription(StreamSubscription streamSubscription) {
     return () {
@@ -104,8 +109,7 @@ class FlutterCometChatDart {
   /// 2. **loginFailure** : returns error on login failed
   /// 3. **logoutSuccess** : callback for successful logout
   /// 4. **logoutFailure** : callback for failed logout
-  Future<void> addLoginListener(
-      String uniqueID, LoginListener loginListener) async {
+  addLoginListener(String uniqueID, LoginListener loginListener) async {
     assert(uniqueID != '');
     _auth.addLoginListener(uniqueID);
 
@@ -155,4 +159,46 @@ class FlutterCometChatDart {
     return ErrorDetails(
         errorCode: err.code, errorDescription: err.message ?? "");
   }
+
+  //#CALLING FUNCTION START
+
+  /// Once the call request is sent and the receiver has accepted the call, both the initiator and the receiver need to call the startCall() method.
+  Future<void> startCall(
+      String sessionID, bool enableDefaultLayout, bool audioOnly) async {
+    _call.startCall(sessionID, enableDefaultLayout, audioOnly);
+  }
+
+  /// This method sends a call request to a user or a group.
+  /// 1. [receiverID] The UID or GUID of the recipient
+  /// 2. [receiverType] The type of the receiver viz. 1.CometChatConstants.RECEIVER_TYPE_USER 2.CometChatConstants.RECEIVER_TYPE_GROUP
+  /// 3. [callType] The type of the call viz. 1.CometChatConstants.CALL_TYPE_AUDIO 2.CometChatConstants.CALL_TYPE_VIDEO
+  Future<void> initiateCall(String UID) async {
+    _call.initiateCall(UID);
+  }
+
+  /// This method listens to Incoming and outgoing calls
+  /// 1. [listenerId] An ID that uniquely identifies that listener.
+  Future<void> addCallListener(String listenerID) async {
+    _call.addCallListener(listenerID);
+  }
+
+  /// Removes the calling listener
+  Future<void> removeCallListener(String listenerID) async {
+    _call.removeCallListener(listenerID);
+  }
+
+  /// To accept incoming call from a user or group
+  Future<void> acceptCall(String sessionID) async {
+    _call.acceptCall(sessionID);
+  }
+
+  /// To reject incoming call from a user or group
+  Future<void> rejectCall(String sessionID) async {
+    _call.rejectCall(sessionID);
+  }
+
+  Stream<dynamic> callDetails() {
+    return _call.callDetails();
+  }
+  //#CALLING FUNCTION END
 }

@@ -4,6 +4,8 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import com.example.flutter_comet_chat_sdk.Helper.CallingHelpers;
+
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
@@ -21,6 +23,8 @@ public class FlutterCometChatSdkPlugin implements FlutterPlugin {
   private EventChannelHelper loginEventTrigger;
   private EventChannelHelper loginEventListener;
 
+  private EventChannelHelper callingEventHelper;
+
   @Override
   public void onAttachedToEngine(@NonNull FlutterPlugin.FlutterPluginBinding flutterPluginBinding) {
     setupChannels(flutterPluginBinding.getBinaryMessenger(), flutterPluginBinding.getApplicationContext());
@@ -33,8 +37,9 @@ public class FlutterCometChatSdkPlugin implements FlutterPlugin {
     channel = new MethodChannel(messenger, "plugins.flutter.io/comet_chat_dart");
     loginEventTrigger = new EventChannelHelper(messenger, "plugins.flutter.io/login_event_trigger");
     loginEventListener = new EventChannelHelper(messenger, "plugins.flutter.io/login_event_listener");
+    callingEventHelper = new EventChannelHelper(messenger, "plugins.flutter.io/calling_details");
 
-    MethodChannelHandler methodChannelHandler = new MethodChannelHandler(context, loginEventTrigger,loginEventListener);
+    MethodChannelHandler methodChannelHandler = new MethodChannelHandler(context, loginEventTrigger,loginEventListener,  callingEventHelper);
     channel.setMethodCallHandler(methodChannelHandler);
   }
 

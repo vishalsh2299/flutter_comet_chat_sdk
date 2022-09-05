@@ -5,6 +5,7 @@ import android.content.Context;
 import com.cometchat.pro.core.AppSettings;
 import com.cometchat.pro.core.CometChat;
 import com.cometchat.pro.exceptions.CometChatException;
+import com.example.flutter_comet_chat_sdk.Helper.CallingHelpers;
 import com.example.flutter_comet_chat_sdk.Helper.GetValue;
 import com.example.flutter_comet_chat_sdk.Helper.LoginLogoutHelper;
 
@@ -20,18 +21,24 @@ public class MethodChannelHandler extends FlutterActivity implements MethodChann
     private Context applicationContext;
     private EventChannelHelper loginEventTrigger;
     private EventChannelHelper loginEventListener;
+    private EventChannelHelper callingEventHelper;
+
+    private CallingHelpers callingHandler;
 
     private LoginLogoutHelper loginHandler;
 
     private GetValue getValue;
 
-    public MethodChannelHandler(Context context, EventChannelHelper loginEventTrigger, EventChannelHelper loginEventListener) {
+    public MethodChannelHandler(Context context, EventChannelHelper loginEventTrigger, EventChannelHelper loginEventListener,  EventChannelHelper callingEventHelper) {
         this.getValue = new GetValue();
 
         this.applicationContext = context;
         this.loginEventTrigger = loginEventTrigger;
         this.loginEventListener = loginEventListener;
         this.loginHandler = new LoginLogoutHelper(loginEventTrigger, loginEventListener);
+
+        this.callingEventHelper = callingEventHelper;
+        this.callingHandler = new CallingHelpers(callingEventHelper);
     }
 
     @Override
@@ -55,6 +62,30 @@ public class MethodChannelHandler extends FlutterActivity implements MethodChann
                 break;
             case "remove_login_listeners":
                 loginHandler.removeLoginListener();
+                result.success("Success");
+                break;
+            case "start_call":
+                callingHandler.startCall(getValue.getValue(call, "sessionID"),
+                        getValue.getBooleanValue(call, "enableDefaultLayout"), getValue.getBooleanValue(call, "audioOnly"));
+            case "initiate_call":
+                callingHandler.initiateCall(getValue.getValue(call, "receiverID"), getValue.getValue(call, "receiverType"),
+                        getValue.getValue(call, "callType"));
+                result.success("Success");
+                break;
+            case "add_call_listener":
+                callingHandler.addCallListener(getValue.getValue(call, "listenerId"), applicationContext);
+                result.success("Success");
+                break;
+            case "remove_call_listener":
+                callingHandler.removeCallListener(getValue.getValue(call, "listenerId"));
+                result.success("Success");
+                break;
+            case "accept_call":
+                callingHandler.acceptCall(getValue.getValue(call, "sessionID"));
+                result.success("Success");
+                break;
+            case "reject_call":
+                callingHandler.rejectCall(getValue.getValue(call, "sessionID"), getValue.getValue(call, "status"));
                 result.success("Success");
                 break;
             default:

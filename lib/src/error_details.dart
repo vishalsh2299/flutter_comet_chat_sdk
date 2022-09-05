@@ -20,9 +20,9 @@ class ErrorDetails implements Exception {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['errorCode'] = this.errorCode;
-    data['errorDescription'] = this.errorDescription;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['errorCode'] = errorCode;
+    data['errorDescription'] = errorDescription;
     return data;
   }
 

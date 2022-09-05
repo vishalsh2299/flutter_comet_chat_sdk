@@ -104,7 +104,7 @@ public class GetValue {
         return call.argument(argument) != null ? call.argument(argument) : -1;
     }
 
-    boolean getBooleanValue(@NonNull MethodCall call, String argument) {
+    public boolean getBooleanValue(@NonNull MethodCall call, String argument) {
         return call.argument(argument) != null ? call.argument(argument) : false;
     }
 
